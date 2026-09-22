@@ -1,4 +1,9 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
+from app.api.prediction import router as prediction_router
+from app.api.health import router as health_router 
+
+
 
 app = FastAPI(
     title = "Product AI API",
@@ -13,8 +18,5 @@ def root():
         "version" : "0.1.0"
     }
 
-@app.get("/health")
-def health():
-    return {
-        "status" : "Healthy"
-    }
+app.include_router(health_router)
+app.include_router(prediction_router)
