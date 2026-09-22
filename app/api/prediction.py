@@ -1,5 +1,5 @@
-from fastapi import APIRouter , Depends
-
+from fastapi import APIRouter , Depends, File, UploadFile
+from PIL import Image
 from app.models.schemas import (
     PredictionRequest,
     PredictionResponse,
@@ -14,7 +14,10 @@ def get_inference_service() -> InferenceService:
 
 
 @router.post("/predict", response_model=PredictionResponse)
-def predict(request: PredictionRequest, 
-            inference_service : InferenceService = Depends(get_inference_service),
-              ):
-    return inference_service.predict(request.image_name)
+async def predict(file : UploadFile = File(...)):
+
+        image = Image.open(file.file)
+
+        inference_service = get_inference_service()
+
+        return inference_service.predict(file.filename)
