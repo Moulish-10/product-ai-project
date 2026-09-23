@@ -1,13 +1,17 @@
-from fastapi import APIRouter , Depends, File, UploadFile
-from PIL import Image
-from app.models.schemas import (
-    PredictionRequest,
-    PredictionResponse,
-)
+from fastapi import APIRouter , Depends, File, UploadFile, HTTPException
+from PIL import Image, UnidentifiedImageError
+from app.models.schemas import PredictionResponse
 from app.services.inference_service import InferenceService
 
 
 router = APIRouter()
+
+ALLOWED_CONTENT_TYPE = {
+      "image/jpg",
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+}
 
 def get_inference_service() -> InferenceService:
     return InferenceService()
@@ -16,8 +20,29 @@ def get_inference_service() -> InferenceService:
 @router.post("/predict", response_model=PredictionResponse)
 async def predict(file : UploadFile = File(...)):
 
-        image = Image.open(file.file)
+        if file.content_type not in ALLOWED_CONTENT_TYPE:
+              raise HTTPException(
+                    status_code=400,
+                    detail = "Unsupported image type. Use Jpg, Jpeg, png or webp"
+              )
+
+        try :
+              
+            image = Image.open(file.file)
+            image.verify()
+
+            file.file.seek(0)
+            image = Image.open(file.file)
+
+        except (UnidentifiedImageError, OSError):
+              raise HTTPException(
+                    status_code=400,
+                    detail = "Uploaded file is not a valid image"
+              )
 
         inference_service = get_inference_service()
 
-        return inference_service.predict(file.filename)
+        return inference_service.predict(
+              image = image,
+              image_name = file.filename
+              )

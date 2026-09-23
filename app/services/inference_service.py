@@ -1,13 +1,22 @@
+from PIL import Image
+
+from app.models.model import AIModel
+from app.utils.image import prepare_image
+
 
 class InferenceService:
-
     def __init__(self):
-        self.model_version = "v0.1.0"
+        self.model = AIModel()
 
-    def predict(self, image_name : str) -> dict:
+    def predict(self, image: Image.Image, image_name: str) -> dict:
+
+        image = prepare_image(image)
+
+        prediction = self.model.predict(image)
+
         return {
-            "message" : "Prediction completed",
-            "image_name" : image_name,
-            "model_version" : self.model_version,
-            "confidence" : 0.0
+            "message": "Prediction completed",
+            "image_name": image_name,
+            "model_version": self.model.model_version,
+            "confidence": prediction["confidence"],
         }
