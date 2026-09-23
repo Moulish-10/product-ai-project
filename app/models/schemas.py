@@ -22,4 +22,7 @@ class PredictionResponse(BaseModel):
     message: str
     image_name: str
     model_version: str
+    image_width: int
+    image_height: int
+    detection_count: int
     detections: list[Detection]

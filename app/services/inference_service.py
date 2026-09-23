@@ -13,6 +13,8 @@ class InferenceService:
 
         image = prepare_image(image)
 
+        width, height = image.size
+
         results = self.model.predict(image)
 
         detections = []
@@ -44,5 +46,8 @@ class InferenceService:
             "message": "Prediction completed",
             "image_name": image_name,
             "model_version": self.model.model_version,
+             "image_width": width,
+            "image_height": height,
+            "detection_count": len(detections),
             "detections": detections,
         }
