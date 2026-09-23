@@ -1,6 +1,7 @@
 from PIL import Image
 
 from app.models.model import AIModel
+from app.models.schemas import Detection , BoundingBox
 from app.utils.image import prepare_image
 
 
@@ -12,11 +13,36 @@ class InferenceService:
 
         image = prepare_image(image)
 
-        prediction = self.model.predict(image)
+        results = self.model.predict(image)
+
+        detections = []
+
+        result = results[0]
+
+        for box in result.boxes:
+            class_id = int(box.cls[0])
+            confidence = float(box.conf[0])
+
+            class_name = result.names[class_id]
+
+            x1,y1,x2,y2 = box.xyxy[0].tolist()
+
+            detections.append(
+                Detection(
+                    class_name=class_name,
+                    confidence=confidence,
+                    bbox = BoundingBox(
+                        x1 = x1,
+                        y1 = y1,
+                        x2 = x2,
+                        y2 = y2,
+                    ),
+                )
+            )
 
         return {
             "message": "Prediction completed",
             "image_name": image_name,
             "model_version": self.model.model_version,
-            "confidence": prediction["confidence"],
+            "detections": detections,
         }

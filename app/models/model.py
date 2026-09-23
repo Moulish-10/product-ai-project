@@ -1,8 +1,10 @@
+from ultralytics import YOLO
+
 class AIModel:
     def __init__(self):
-        self.model_version = "v0.1.0"
+        self.model_version = "yolo11n"
+        self.model = YOLO("yolo11n.pt")
 
     def predict(self, image):
-        return {
-            "confidence" : 0.0
-        }
+        results = self.model(image)
+        return results
