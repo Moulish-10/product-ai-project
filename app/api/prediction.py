@@ -2,9 +2,11 @@ from fastapi import APIRouter , Depends, File, UploadFile, HTTPException
 from PIL import Image, UnidentifiedImageError
 from app.models.schemas import PredictionResponse
 from app.services.inference_service import InferenceService
-
+from app.utils.logger import get_logger
 
 router = APIRouter()
+
+logger = get_logger(__name__)
 
 ALLOWED_CONTENT_TYPE = {
       "image/jpg",
@@ -39,10 +41,25 @@ async def predict(file : UploadFile = File(...)):
                     status_code=400,
                     detail = "Uploaded file is not a valid image"
               )
+        try :
+            logger.info(
+                "Prediction request received: %s",
+                file.filename,
+            )
+            inference_service = get_inference_service()
 
-        inference_service = get_inference_service()
+            return inference_service.predict(
+                image = image,
+                image_name = file.filename
+                )
+        
+        except Exception:
+            logger.exception(
+                "Prediction failed: %s",
+                file.filename,
+            )
 
-        return inference_service.predict(
-              image = image,
-              image_name = file.filename
-              )
+            raise HTTPException(
+                status_code=500,
+                detail="Prediction failed.",
+            )
