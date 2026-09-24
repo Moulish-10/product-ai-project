@@ -20,7 +20,10 @@ def get_inference_service() -> InferenceService:
 
 
 @router.post("/predict", response_model=PredictionResponse)
-async def predict(file : UploadFile = File(...)):
+async def predict(
+    file: UploadFile = File(...),
+    inference_service: InferenceService = Depends(get_inference_service),
+    ):
 
         if file.content_type not in ALLOWED_CONTENT_TYPE:
               raise HTTPException(
@@ -46,7 +49,6 @@ async def predict(file : UploadFile = File(...)):
                 "Prediction request received: %s",
                 file.filename,
             )
-            inference_service = get_inference_service()
 
             return inference_service.predict(
                 image = image,
