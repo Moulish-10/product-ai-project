@@ -22,7 +22,23 @@ def get_inference_service() -> InferenceService:
     return InferenceService()
 
 
-@router.post("/predict", response_model=PredictionResponse)
+@router.post(
+    "/predict",
+    response_model=PredictionResponse,
+    summary="Run object detection",
+    description=(
+        "Upload an image and run YOLO object detection. "
+        "Supported formats: JPEG, PNG, and WEBP."
+    ),
+    responses={
+        400: {
+            "description": "Invalid or unsupported image."
+        },
+        500: {
+            "description": "Prediction failed."
+        },
+    },
+)
 async def predict(
     file: UploadFile = File(...),
     inference_service: InferenceService = Depends(get_inference_service),

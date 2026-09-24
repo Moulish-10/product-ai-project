@@ -6,9 +6,12 @@ from app.api.health import router as health_router
 
 
 app = FastAPI(
-    title = "Product AI API",
-    description = "Production oriented AI inference service",
-    version = "0.1.0"
+    title="Product AI API",
+    description=(
+        "Production-oriented computer vision inference API "
+        "for object detection."
+    ),
+    version="0.1.0",
 )
 
 @app.get("/")
