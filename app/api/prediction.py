@@ -3,6 +3,8 @@ from PIL import Image, UnidentifiedImageError
 from app.models.schemas import PredictionResponse
 from app.services.inference_service import InferenceService
 from app.utils.logger import get_logger
+from functools import lru_cache
+import time
 
 router = APIRouter()
 
@@ -15,6 +17,7 @@ ALLOWED_CONTENT_TYPE = {
       "image/webp"
 }
 
+@lru_cache
 def get_inference_service() -> InferenceService:
     return InferenceService()
 
@@ -44,16 +47,28 @@ async def predict(
                     status_code=400,
                     detail = "Uploaded file is not a valid image"
               )
-        try :
+        try:
             logger.info(
                 "Prediction request received: %s",
                 file.filename,
             )
 
-            return inference_service.predict(
-                image = image,
-                image_name = file.filename
-                )
+            start_time = time.perf_counter()
+
+            result = inference_service.predict(
+                image=image,
+                image_name=file.filename
+            )
+
+            elapsed_time = time.perf_counter() - start_time
+
+            logger.info(
+                "Prediction completed: %s | latency = %.4f seconds",
+                file.filename,
+                elapsed_time
+            )
+
+            return result
         
         except Exception:
             logger.exception(

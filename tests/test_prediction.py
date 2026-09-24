@@ -19,6 +19,8 @@ class MockInferenceService:
             "image_width": image.width,
             "image_height": image.height,
             "detection_count": 1,
+            "inference_time_ms": 123.45,
+
             "detections": [
                 {
                     "class_name": "cat",
