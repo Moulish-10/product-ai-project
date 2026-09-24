@@ -25,4 +25,5 @@ class PredictionResponse(BaseModel):
     image_width: int
     image_height: int
     detection_count: int
+    inference_time_ms : float
     detections: list[Detection]

@@ -4,6 +4,7 @@ from app.models.model import AIModel
 from app.models.schemas import Detection , BoundingBox
 from app.utils.image import prepare_image
 
+import time
 
 class InferenceService:
     def __init__(self):
@@ -15,7 +16,11 @@ class InferenceService:
 
         width, height = image.size
 
+        start_time = time.perf_counter()
+
         results = self.model.predict(image)
+
+        inference_time = time.perf_counter() - start_time
 
         detections = []
 
@@ -46,8 +51,9 @@ class InferenceService:
             "message": "Prediction completed",
             "image_name": image_name,
             "model_version": self.model.model_version,
-             "image_width": width,
+            "image_width": width,
             "image_height": height,
             "detection_count": len(detections),
+            "inference_time_ms": round(inference_time * 1000, 2),
             "detections": detections,
         }
