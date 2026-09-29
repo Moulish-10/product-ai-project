@@ -6,3 +6,5 @@ ultralytics
 pytest
 httpx
 pydantic-settings
+sqlalchemy
+psycopg2-binary
