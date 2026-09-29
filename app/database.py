@@ -3,7 +3,6 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.config import settings
 
-
 engine = create_engine(
     settings.database_url,
 )
@@ -28,5 +27,6 @@ def get_db():
 
 def init_db():
     from app.models.prediction import Prediction
+    from app.models.detection import Detection
 
     Base.metadata.create_all(bind=engine)
