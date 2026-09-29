@@ -1,0 +1,21 @@
+services:
+
+  api:
+    build: .
+    container_name: product-ai-api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://product_ai_user:product_ai_password@postgres:5432/product_ai
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    container_name: product-ai-postgres
+    environment:
+      POSTGRES_DB: product_ai
+      POSTGRES_USER: product_ai_user
+      POSTGRES_PASSWORD: product_ai_password
+    ports:
+      - "5432:5432"
