@@ -7,11 +7,12 @@ from PIL import Image, UnidentifiedImageError
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.models import prediction
 from app.models.prediction import Prediction
 from app.models.schemas import PredictionResponse
 from app.services.inference_service import InferenceService
 from app.utils.logger import get_logger
-
+from app.models.detection import Detection
 
 router = APIRouter()
 
@@ -89,17 +90,32 @@ async def predict(
         )
 
         prediction = Prediction(
-            request_id=request_id,
-            image_name=file.filename,
-            model_version=result["model_version"],
-            detection_count=result["detection_count"],
-            inference_time_ms=result["inference_time_ms"],
+        request_id=request_id,
+        image_name=file.filename,
+        model_version=result["model_version"],
+        detection_count=result["detection_count"],
+        inference_time_ms=result["inference_time_ms"],
         )
 
         db.add(prediction)
+        db.flush()
+
+        for detection in result["detections"]:
+            db_detection = Detection(
+                prediction_id=prediction.id,
+                class_name=detection.class_name,
+                confidence=detection.confidence,
+                x1=detection.bbox.x1,
+                y1=detection.bbox.y1,
+                x2=detection.bbox.x2,
+                y2=detection.bbox.y2,
+            )
+
+            db.add(db_detection)
+
         db.commit()
         db.refresh(prediction)
-
+        
         elapsed_time = time.perf_counter() - start_time
 
         logger.info(

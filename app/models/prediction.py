@@ -3,6 +3,12 @@ from datetime import datetime
 from sqlalchemy import DateTime, Float, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
+from typing import TYPE_CHECKING
+from sqlalchemy.orm import relationship
+
+if TYPE_CHECKING:
+    from app.models.detection import Detection
+
 from app.database import Base
 
 
@@ -39,4 +45,10 @@ class Prediction(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,
+    )
+
+    detections: Mapped[list["Detection"]] = relationship(
+    "Detection",
+    back_populates="prediction",
+    cascade="all, delete-orphan",
     )

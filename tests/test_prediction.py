@@ -1,4 +1,5 @@
 from io import BytesIO
+from urllib import response
 
 from fastapi.testclient import TestClient
 from PIL import Image
@@ -14,6 +15,7 @@ from app.database import Base, get_db
 from app.models.prediction import Prediction
 client = TestClient(app)
 
+from app.models.schemas import BoundingBox, Detection
 
 class MockInferenceService:
     def predict(self, image, image_name):
@@ -21,22 +23,21 @@ class MockInferenceService:
             "message": "Prediction completed",
             "image_name": image_name,
             "model_version": "test-model",
-            "image_width": image.width,
-            "image_height": image.height,
+            "image_width": 200,
+            "image_height": 200,
             "detection_count": 1,
             "inference_time_ms": 123.45,
-
             "detections": [
-                {
-                    "class_name": "cat",
-                    "confidence": 0.95,
-                    "bbox": {
-                        "x1": 10.0,
-                        "y1": 20.0,
-                        "x2": 100.0,
-                        "y2": 150.0,
-                    },
-                }
+                Detection(
+                    class_name="cat",
+                    confidence=0.95,
+                    bbox=BoundingBox(
+                        x1=10,
+                        y1=20,
+                        x2=100,
+                        y2=150,
+                    ),
+                )
             ],
         }
 
