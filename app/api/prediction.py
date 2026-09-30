@@ -82,15 +82,18 @@ async def predict(
         )
 
     try:
-        logger.info(
-            "Prediction request received: %s",
-            file.filename,
-        )
+        
 
         start_time = time.perf_counter()
 
         request_id = str(uuid.uuid4())
 
+        logger.info(
+                    "Prediction request received: %s",
+                    file.filename,
+                    extra={"request_id": request_id},
+                )
+        
         result = inference_service.predict(
             image=image,
             image_name=file.filename,
@@ -129,6 +132,7 @@ async def predict(
             "Prediction completed: %s | latency = %.4f seconds",
             file.filename,
             elapsed_time,
+            extra={"request_id": request_id},
         )
 
         return result
@@ -140,7 +144,8 @@ async def predict(
         logger.exception(
             "Prediction failed: %s",
             file.filename,
-        )
+            extra={"request_id": request_id},
+    )
 
         raise HTTPException(
             status_code=500,
