@@ -1,8 +1,14 @@
 from functools import lru_cache
 import time
-import uuid
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Request,
+    UploadFile,
+)
 from PIL import Image, UnidentifiedImageError
 from sqlalchemy.orm import Session
 
@@ -56,6 +62,7 @@ def get_inference_service() -> InferenceService:
     },
 )
 async def predict(
+    request: Request,
     file: UploadFile = File(...),
     inference_service: InferenceService = Depends(
         get_inference_service
@@ -86,7 +93,7 @@ async def predict(
 
         start_time = time.perf_counter()
 
-        request_id = str(uuid.uuid4())
+        request_id = request.state.request_id
 
         logger.info(
                     "Prediction request received: %s",
