@@ -127,6 +127,9 @@ async def predict(
         return result
 
     except Exception:
+
+        db.rollback()
+
         logger.exception(
             "Prediction failed: %s",
             file.filename,
