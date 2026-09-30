@@ -7,12 +7,19 @@ from PIL import Image, UnidentifiedImageError
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import prediction
+
 from app.models.prediction import Prediction
-from app.models.schemas import PredictionResponse
+from app.models.schemas import (
+    PredictionResponse,
+    PredictionHistoryItem,
+    PredictionHistoryResponse,
+    PredictionDetailResponse,
+    Detection as DetectionSchema,
+)
+
+from app.models.detection import Detection as DetectionModel
 from app.services.inference_service import InferenceService
 from app.utils.logger import get_logger
-from app.models.detection import Detection
 
 router = APIRouter()
 
@@ -101,7 +108,7 @@ async def predict(
         db.flush()
 
         for detection in result["detections"]:
-            db_detection = Detection(
+            db_detection = DetectionModel(
                 prediction_id=prediction.id,
                 class_name=detection.class_name,
                 confidence=detection.confidence,
@@ -139,3 +146,83 @@ async def predict(
             status_code=500,
             detail="Prediction failed.",
         )
+
+@router.get(
+    "/predictions/{prediction_id}",
+    response_model=PredictionDetailResponse,
+    summary="Get prediction details",
+    description="Return one prediction together with its detections.",
+)
+def get_prediction(
+    prediction_id: int,
+    db: Session = Depends(get_db),
+):
+    prediction = (
+        db.query(Prediction)
+        .filter(Prediction.id == prediction_id)
+        .first()
+    )
+
+    if prediction is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Prediction not found.",
+        )
+
+    detections = [
+        DetectionSchema(
+            class_name=detection.class_name,
+            confidence=detection.confidence,
+            bbox={
+                "x1": detection.x1,
+                "y1": detection.y1,
+                "x2": detection.x2,
+                "y2": detection.y2,
+            },
+        )
+        for detection in prediction.detections
+    ]
+
+    return PredictionDetailResponse(
+        id=prediction.id,
+        request_id=prediction.request_id,
+        image_name=prediction.image_name,
+        model_version=prediction.model_version,
+        detection_count=prediction.detection_count,
+        inference_time_ms=prediction.inference_time_ms,
+        created_at=prediction.created_at,
+        detections=detections,
+    )
+
+@router.get(
+    "/predictions",
+    response_model=PredictionHistoryResponse,
+    summary="Get prediction history",
+    description="Return previously stored prediction records.",
+)
+def get_predictions(
+    db: Session = Depends(get_db),
+):
+    predictions = (
+        db.query(Prediction)
+        .order_by(Prediction.created_at.desc())
+        .all()
+    )
+
+    items = [
+        PredictionHistoryItem(
+            id=item.id,
+            request_id=item.request_id,
+            image_name=item.image_name,
+            model_version=item.model_version,
+            detection_count=item.detection_count,
+            inference_time_ms=item.inference_time_ms,
+            created_at=item.created_at,
+        )
+        for item in predictions
+    ]
+
+    return PredictionHistoryResponse(
+        predictions=items,
+        total=len(items),
+    )

@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 class HealthResponse(BaseModel):
     status : str
@@ -26,4 +27,28 @@ class PredictionResponse(BaseModel):
     image_height: int
     detection_count: int
     inference_time_ms : float
+    detections: list[Detection]
+
+class PredictionHistoryItem(BaseModel):
+    id: int
+    request_id: str
+    image_name: str
+    model_version: str
+    detection_count: int
+    inference_time_ms: float
+    created_at: datetime
+
+
+class PredictionHistoryResponse(BaseModel):
+    predictions: list[PredictionHistoryItem]
+    total: int
+
+class PredictionDetailResponse(BaseModel):
+    id: int
+    request_id: str
+    image_name: str
+    model_version: str
+    detection_count: int
+    inference_time_ms: float
+    created_at: datetime
     detections: list[Detection]
