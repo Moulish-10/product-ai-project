@@ -52,3 +52,8 @@ class PredictionDetailResponse(BaseModel):
     inference_time_ms: float
     created_at: datetime
     detections: list[Detection]
+
+class ErrorResponse(BaseModel):
+    error: str
+    request_id: str | None = None
+    status_code: int
