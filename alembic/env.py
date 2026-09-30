@@ -8,11 +8,15 @@ from alembic import context
 from app.database import Base
 from app.models.prediction import Prediction
 from app.models.detection import Detection
-
+import os
 
 # Alembic Config object
 config = context.config
 
+database_url = os.getenv("DATABASE_URL")
+
+if database_url:
+    config.set_main_option("sqlalchemy.url", database_url)
 
 # Configure Python logging
 if config.config_file_name is not None:

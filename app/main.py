@@ -10,6 +10,8 @@ from app.models.detection import Detection
 
 import uuid
 
+from app.models.schemas import ErrorResponse
+
 app = FastAPI(
     title="Product AI API",
     description="Production-oriented AI inference service",
@@ -30,20 +32,22 @@ async def request_id_middleware(request: Request, call_next):
 
 @app.exception_handler(Exception)
 async def global_exception_handler(
-    request : Request,
-    exc : Exception,
-    ):
+    request: Request,
+    exc: Exception,
+):
+    request_id = getattr(
+        request.state,
+        "request_id",
+        None,
+    )
+
     return JSONResponse(
         status_code=500,
-        content={
-            "error" : "Internal server error",
-            "request_id" : getattr(
-                request.state,
-                "request_id",
-                None,
-            ),
-            "status_code" : 500
-        }
+        content=ErrorResponse(
+            error="Internal server error.",
+            request_id=request_id,
+            status_code=500,
+        ).model_dump(),
     )
 
 
