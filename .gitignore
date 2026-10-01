@@ -23,7 +23,7 @@ Thumbs.db
 .ipynb_checkpoints/
 
 # ML artifacts
-*.pt
+# *.pt
 *.pth
 *.onnx
 *.h5
