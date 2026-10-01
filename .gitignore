@@ -39,3 +39,6 @@ data/*
 # Temporary files
 tmp/
 temp/
+
+data/neu_det_raw/
+runs/
