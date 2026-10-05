@@ -29,7 +29,7 @@ RUN useradd --create-home --shell /bin/bash appuser \
 COPY app ./app
 COPY alembic ./alembic
 COPY alembic.ini ./
-COPY yolo11n.pt ./
+COPY models ./models
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
