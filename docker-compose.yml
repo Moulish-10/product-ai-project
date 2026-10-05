@@ -1,7 +1,7 @@
 services:
   api:
     build: .
-    container_name: product-ai-api
+    container_name: steelvision-api
     ports:
       - "8000:8000"
     environment:
@@ -15,7 +15,7 @@ services:
 
   postgres:
     image: postgres:16
-    container_name: product-ai-postgres
+    container_name: steelvision-postgres
     environment:
       POSTGRES_DB: product_ai
       POSTGRES_USER: product_ai_user
@@ -32,7 +32,7 @@ services:
     build:
       context: .
       dockerfile: ui/Dockerfile
-    container_name: product-ai-ui
+    container_name: steelvision-ui
     ports:
       - "8501:8501"
     environment:

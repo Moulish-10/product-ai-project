@@ -1,4 +1,4 @@
-# Product AI Project
+# SteelVision AI
 
 A production-oriented AI inference API built with FastAPI, YOLO11n, PostgreSQL, SQLAlchemy, Alembic, Docker, and GitHub Actions.
 
@@ -76,7 +76,7 @@ Architecture
                                 │  detections     │
                                 └─────────────────┘
 Project Structure
-Product-AI-Project/
+SteelVision-AI/
 │
 ├── .github/
 │   └── workflows/
@@ -168,7 +168,7 @@ docker compose ps
 
 View API logs:
 
-docker logs product-ai-api
+docker logs steelvision-api
 
 The API is available at:
 

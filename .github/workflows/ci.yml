@@ -1,4 +1,4 @@
-name: Product AI CI
+name: SteelVision AI CI
 
 on:
   push:

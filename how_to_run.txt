@@ -1,0 +1,19 @@
+1. Go to the project directort:
+cd Mc:\Github_cloning\steelvision-AI-Project
+
+2. Build Docker:
+docker compose up -d --build
+
+3. Check containers:
+docker ps
+
+You should see:
+steelvision-api       Up (healthy)
+steelvision-postgres  Up (healthy)
+steelvision-ui        Up
+
+4. Check API
+http://localhost:8000/
+
+5. open web 
+http://localhost:8501/

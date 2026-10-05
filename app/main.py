@@ -13,7 +13,7 @@ import uuid
 from app.models.schemas import ErrorResponse
 
 app = FastAPI(
-    title="Product AI API",
+    title="SteelVision AI API",
     description="Production-oriented AI inference service",
     version="0.1.0",
 )
@@ -54,7 +54,7 @@ async def global_exception_handler(
 @app.get("/")
 def root():
     return {
-        "message": "Product AI API is running",
+        "message": "SteelVision AI API is running",
         "version": "0.1.0",
     }
 
